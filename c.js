@@ -1,34 +1,41 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // Toggle Mode Sombre / Clair
     const themeToggle = document.getElementById('theme-toggle');
+
     if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
+        const updateThemeButton = () => {
             const isDark = document.body.classList.contains('dark-mode');
             themeToggle.textContent = isDark ? '☀️ Mode Clair' : '🌙 Mode Sombre';
+            themeToggle.setAttribute('aria-pressed', String(isDark));
+        };
+
+        updateThemeButton();
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            updateThemeButton();
         });
     }
 
-    // Animation d'apparition au défilement des sections
     const sections = document.querySelectorAll('.interactive-section');
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
+
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.15
         });
-    }, { 
-        threshold: 0.15 
-    });
 
-    sections.forEach(section => {
-        observer.observe(section);
-    });
+        sections.forEach((section) => observer.observe(section));
+    } else {
+        sections.forEach((section) => section.classList.add('visible'));
+    }
 
-    // Effet tactile/clic sur les cartes d'information
     const cards = document.querySelectorAll('.card');
-    cards.forEach(card => {
+    cards.forEach((card) => {
         card.addEventListener('click', () => {
             card.style.transform = 'scale(0.97)';
             setTimeout(() => {
@@ -37,18 +44,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Affichage / Masquage interactif de la liste de gestes réflexes
     const actionBtn = document.getElementById('action-btn');
     const actionContent = document.getElementById('action-content');
 
     if (actionBtn && actionContent) {
+        const updateActionButton = () => {
+            const isHidden = actionContent.classList.contains('hidden');
+            actionBtn.textContent = isHidden ? 'Découvrir les 5 gestes réflexes' : 'Masquer les gestes réflexes';
+            actionBtn.setAttribute('aria-expanded', String(!isHidden));
+        };
+
+        updateActionButton();
+
         actionBtn.addEventListener('click', () => {
             actionContent.classList.toggle('hidden');
-            if (actionContent.classList.contains('hidden')) {
-                actionBtn.textContent = 'Découvrir les 5 gestes réflexes';
-            } else {
-                actionBtn.textContent = 'Masquer les gestes réflexes';
-            }
+            updateActionButton();
         });
     }
-});s
+});
